@@ -1,0 +1,132 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Tenants must use a real Google account (no anonymous/guest sign-in).
+    function googleUser() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    // ---------- Manager data: owner only ----------
+    match /pgManagers/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+
+      // Photos, ID proof chunks and thumbnail maps.
+      match /files/{fileId} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // ---------- Tenant self-registration links ----------
+    match /tenantLinks/{token} {
+      function isOwner() {
+        return signedIn() && resource.data.uid == request.auth.uid;
+      }
+
+      // Anyone with the unguessable token may read an active link; nobody may list links
+      // except the owner querying their own.
+      allow get: if (resource.data.active == true && googleUser()) || isOwner();
+      allow list: if isOwner();
+
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.active == true
+        && request.resource.data.claimed == {};
+
+      allow delete: if isOwner();
+
+      // Owner can change anything except the owner uid.
+      // A tenant may only claim exactly one free bed, and only together with its submission.
+      allow update: if (isOwner() && request.resource.data.uid == resource.data.uid)
+        || (
+          googleUser()
+          && resource.data.active == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed', 'lastClaim'])
+          && request.resource.data.claimed.diff(resource.data.claimed).addedKeys()
+               == [request.resource.data.lastClaim].toSet()
+          && request.resource.data.claimed.diff(resource.data.claimed).removedKeys().size() == 0
+          && request.resource.data.claimed.diff(resource.data.claimed).changedKeys().size() == 0
+          && request.resource.data.claimed[request.resource.data.lastClaim] == true
+          && request.resource.data.lastClaim in resource.data.beds
+          && existsAfter(/databases/$(database)/documents/tenantLinks/$(token)/submissions/$(request.resource.data.lastClaim))
+        );
+
+      // One request per Google account per link: the marker doc id is the tenant's uid,
+      // and it can only be created (never overwritten) together with their submission.
+      match /applicants/{applicantUid} {
+        allow get: if signedIn() && request.auth.uid == applicantUid;
+        allow read, delete: if signedIn()
+          && get(/databases/$(database)/documents/tenantLinks/$(token)).data.uid == request.auth.uid;
+        allow create: if googleUser()
+          && request.auth.uid == applicantUid
+          && get(/databases/$(database)/documents/tenantLinks/$(token)).data.active == true
+          && request.resource.data.keys().hasOnly(['bedKey', 'email', 'createdAt'])
+          && request.resource.data.bedKey is string
+          && request.resource.data.email == request.auth.token.email
+          && request.resource.data.createdAt == request.time
+          && getAfter(/databases/$(database)/documents/tenantLinks/$(token)/submissions/$(request.resource.data.bedKey)).data.by == request.auth.uid;
+      }
+
+      match /submissions/{bedKey} {
+        function link() {
+          return get(/databases/$(database)/documents/tenantLinks/$(token)).data;
+        }
+        function linkOwner() {
+          return signedIn() && link().uid == request.auth.uid;
+        }
+        function shortString(field, max) {
+          return request.resource.data[field] is string && request.resource.data[field].size() <= max;
+        }
+
+        allow read, delete: if linkOwner();
+
+        allow create: if googleUser()
+          && link().active == true
+          && !exists(/databases/$(database)/documents/tenantLinks/$(token)/applicants/$(request.auth.uid))
+          && getAfter(/databases/$(database)/documents/tenantLinks/$(token)/applicants/$(request.auth.uid)).data.bedKey == bedKey
+          && bedKey in link().beds
+          && !(bedKey in link().claimed)
+          && getAfter(/databases/$(database)/documents/tenantLinks/$(token)).data.claimed[bedKey] == true
+          && request.resource.data.by == request.auth.uid
+          && request.resource.data.keys().hasOnly(
+               ['name', 'phone', 'emergencyContact', 'address', 'idNote', 'roomId', 'bed',
+                'hasPhoto', 'proofName', 'proofType', 'proofChunks', 'by', 'email', 'createdAt'])
+          && request.resource.data.email == request.auth.token.email
+          && shortString('name', 80) && request.resource.data.name.size() > 0
+          && shortString('phone', 20) && request.resource.data.phone.size() >= 7
+          && shortString('emergencyContact', 120)
+          && shortString('address', 300)
+          && shortString('idNote', 120)
+          && shortString('roomId', 80)
+          && shortString('bed', 20)
+          && request.resource.data.hasPhoto is bool
+          && shortString('proofName', 120)
+          && shortString('proofType', 40)
+          && request.resource.data.proofChunks is int
+          && request.resource.data.proofChunks >= 0 && request.resource.data.proofChunks <= 4
+          && request.resource.data.createdAt == request.time;
+
+        match /files/{fileId} {
+          function submission() {
+            return get(/databases/$(database)/documents/tenantLinks/$(token)/submissions/$(bedKey)).data;
+          }
+
+          allow read, delete: if linkOwner();
+
+          // Only the tenant who created the request can attach files, once each, size-capped.
+          allow create: if googleUser()
+            && link().active == true
+            && submission().by == request.auth.uid
+            && fileId in ['photo', 'thumb', 'proof_0', 'proof_1', 'proof_2', 'proof_3']
+            && request.resource.data.keys().hasOnly(['data'])
+            && request.resource.data.data is string
+            && request.resource.data.data.size() <= 420000;
+        }
+      }
+    }
+  }
+}
