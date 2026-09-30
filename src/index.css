@@ -1674,7 +1674,8 @@ textarea {
 }
 .form label,
 .field {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.35rem;
   font-size: 0.84rem;
   font-weight: 600;
@@ -1683,12 +1684,14 @@ textarea {
 .field-label {
   font-size: 0.84rem;
   font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
 }
 .optional {
   font-weight: 400;
-  color: var(--muted);
-  font-size: 0.78rem;
-  margin-left: 0.2rem;
+  color: #dc2626;
+  font-size: 0.84rem;
 }
 .hint {
   font-weight: 400;
