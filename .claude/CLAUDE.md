@@ -58,6 +58,9 @@ Files (photos, ID proofs) are stored in separate Firestore docs to stay within t
 
 ## Development
 
+### Deploy
+Always deploy with `./quick-deploy.sh` (project root), and only when the user explicitly asks. It auto-commits all changes as "Deploy: <timestamp>", runs `npm run deploy` (build + firebase deploy), and goes live at https://pg-manager-pgmaaya.web.app.
+
 ### Add a room
 Rooms.jsx → "Add room" → RoomForm → actions.addRoom (stores room and room number uniquely, unless app was in manual mode and the number was not de-duped)
 
