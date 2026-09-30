@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Building2, BedDouble, CalendarClock, IndianRupee } from 'lucide-react'
+import { Building2, BedDouble, CalendarClock, IndianRupee, Mail, Lock, Eye, EyeOff, ArrowRight, Home } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 
 const FEATURES = [
@@ -8,6 +8,36 @@ const FEATURES = [
   [CalendarClock, 'Who leaves in the next 30 days'],
   [IndianRupee, 'Monthly rent: paid vs due'],
 ]
+
+function Logo({ small }) {
+  return (
+    <span className={small ? 'pgm-logo small' : 'pgm-logo'}>
+      {small ? 'PG' : 'PGMaaya'}
+    </span>
+  )
+}
+
+function Field({ icon: Icon, type = 'text', toggle, ...props }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="form-row">
+      <div className="field">
+        <Icon size={18} className="field-icon" />
+        <input type={toggle && show ? 'text' : type} {...props} />
+        {toggle && (
+          <button
+            type="button"
+            className="field-toggle"
+            onClick={() => setShow((v) => !v)}
+            aria-label={show ? 'Hide password' : 'Show password'}
+          >
+            {show ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function Login() {
   const { signUpWithEmail, signInWithEmail, resetPassword, error, demoMode } = useAuth()
@@ -64,15 +94,19 @@ export default function Login() {
       <div className="login-hero">
         <div className="brand">
           <span className="brand-icon">
-            <Building2 size={22} />
+            <Logo small />
           </span>
-          <div className="brand-name">PG Manager</div>
+          <div>
+            <Logo />
+            <div className="brand-name">PG Manager</div>
+          </div>
         </div>
         <h1>
           Run every PG
           <br />
-          from one dashboard.
+          <em>from one dashboard.</em>
         </h1>
+        <p className="hero-tag">Simpler. Smarter. Together.</p>
         <ul className="feature-list">
           {FEATURES.map(([Icon, text]) => (
             <li key={text}>
@@ -87,6 +121,10 @@ export default function Login() {
 
       <div className="login-panel">
         <div className="login-card">
+          <div className="card-logo">
+            <Logo />
+            <p>Your Home Away From Home</p>
+          </div>
           {resetSent ? (
             <>
               <h2>Check your email ✓</h2>
@@ -109,16 +147,7 @@ export default function Login() {
               <h2>Reset password</h2>
               <p className="muted">Enter your email and we'll send a reset link.</p>
               <form onSubmit={handleResetPassword}>
-                <div className="form-row">
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    required
-                  />
-                </div>
+                <Field icon={Mail} type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} required />
                 <button type="submit" className="form-button" disabled={loading}>
                   {loading ? 'Sending...' : 'Send reset link'}
                 </button>
@@ -136,30 +165,12 @@ export default function Login() {
           ) : mode === 'signin' ? (
             <>
               <h2>Welcome back 👋</h2>
-              <p className="muted">Sign in to manage your properties.</p>
+              <p className="muted">Sign in to manage your PG.</p>
               <form onSubmit={handleSignIn}>
-                <div className="form-row">
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    required
-                  />
-                </div>
-                <div className="form-row">
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    required
-                  />
-                </div>
+                <Field icon={Mail} type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} required />
+                <Field icon={Lock} type="password" toggle placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} required />
                 <button type="submit" className="form-button" disabled={loading}>
-                  {loading ? 'Signing in...' : 'Sign in'}
+                  {loading ? 'Signing in...' : <>Sign in <ArrowRight size={18} /></>}
                 </button>
               </form>
               <div className="auth-links">
@@ -176,26 +187,8 @@ export default function Login() {
               <h2>Create account 🚀</h2>
               <p className="muted">Sign up to start managing your PGs.</p>
               <form onSubmit={handleSignUp}>
-                <div className="form-row">
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    required
-                  />
-                </div>
-                <div className="form-row">
-                  <input
-                    type="password"
-                    placeholder="Password (min 6 characters)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    required
-                  />
-                </div>
+                <Field icon={Mail} type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} required />
+                <Field icon={Lock} type="password" toggle placeholder="Password (min 6 characters)" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} required />
                 <button type="submit" className="form-button" disabled={loading}>
                   {loading ? 'Creating account...' : 'Sign up'}
                 </button>
@@ -207,6 +200,10 @@ export default function Login() {
           )}
 
           {localError && <p className="error">{localError}</p>}
+
+          <div className="card-footer">
+            <Home size={14} /> PG Manager
+          </div>
 
           {demoMode && (
             <p className="notice">

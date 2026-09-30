@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&display=swap');
 :root {
   --bg: #f4f6fb;
   --surface: #ffffff;
@@ -3087,3 +3088,50 @@ textarea {
   display: flex;
   gap: 8px;
 }
+
+/* ============ Login redesign (PGMaaya lavender theme) ============ */
+.login { --pg-purple: #2e1f7a; --pg-purple-2: #4b3a9e; --pg-lav: #ede9fb; grid-template-columns: 1fr 1fr; }
+.login-hero {
+  background: linear-gradient(160deg, #f4f1fd 0%, #e7e1f9 100%);
+  color: var(--pg-purple);
+}
+.login-hero .brand { display: flex; align-items: center; gap: 0.9rem; }
+.login-hero .brand-icon {
+  width: 56px; height: 56px; border-radius: 14px; background: var(--pg-purple);
+  display: grid; place-items: center; color: #fff;
+}
+.login-hero .brand-name { color: #6b6791; font-size: 1.05rem; }
+.login-hero h1 { color: var(--pg-purple); }
+.login-hero h1 em { font-style: normal; color: #7462c9; }
+.hero-tag { color: #6b6791; font-size: 1.2rem; margin: -1.5rem 0 0; }
+.login-hero .feature-list { color: var(--pg-purple); margin: 0 0 auto; }
+.login-hero .feature-list li span { background: #ddd6f6; color: var(--pg-purple-2); }
+.pgm-logo { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-size: 2.4rem; color: var(--pg-purple); line-height: 1; display: inline-flex; align-items: flex-start; }
+.pgm-logo sup { color: #e0b043; font-size: 0.4em; margin: 0 0.1em; }
+.pgm-logo span { font-weight: 600; }
+.pgm-logo.small { font-size: 1.15rem; color: #fff; }
+.pgm-logo.small span { display: none; }
+.login-panel { background: #fbfaff; }
+.login-panel::before { background: radial-gradient(circle, rgba(116, 98, 201, 0.15) 0%, transparent 70%); }
+.login-card { width: min(440px, 100%); border-radius: 28px; padding: 2.25rem 2rem; box-shadow: 0 20px 60px rgba(75, 58, 158, 0.12); }
+.card-logo { text-align: center; margin-bottom: 0.5rem; }
+.card-logo .pgm-logo { font-size: 2.8rem; }
+.card-logo p { margin: 0.35rem 0 0; color: #6b6791; font-size: 0.92rem; }
+.login-card h2 { background: none; -webkit-text-fill-color: var(--pg-purple); color: var(--pg-purple); }
+.field { position: relative; }
+.field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6b6791; pointer-events: none; }
+.login-card .field input { width: 100%; padding: 0.9rem 2.8rem; background: #f4f2fc; border: 1.5px solid #ebe8f7; border-radius: 12px; }
+.login-card .field input:focus { border-color: var(--pg-purple-2); box-shadow: 0 0 0 3px rgba(75, 58, 158, 0.12); }
+.field-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6b6791; cursor: pointer; display: grid; padding: 4px; }
+.login-card .form-button { background: var(--pg-purple-2); display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 8px 24px rgba(75, 58, 158, 0.25); }
+.login-card .form-button:hover:not(:disabled) { background: var(--pg-purple); box-shadow: 0 12px 32px rgba(75, 58, 158, 0.35); }
+.login-card .link-button { color: var(--pg-purple-2); text-decoration: none; }
+.login-card .link-button:hover { color: var(--pg-purple); text-decoration: underline; }
+.card-footer { display: flex; align-items: center; justify-content: center; gap: 0.4rem; color: #6b6791; font-size: 0.82rem; margin-top: 0.5rem; }
+@media (max-width: 720px) {
+  .login { grid-template-columns: 1fr; }
+  .hero-tag { margin-top: 0; }
+  .login-hero .feature-list { display: none; }
+}
+
+.pgm-logo { font-family: 'Playfair Display', Georgia, serif; font-weight: 800; letter-spacing: -0.02em; text-transform: none; white-space: nowrap; display: inline-block; }
