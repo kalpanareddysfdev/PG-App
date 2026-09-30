@@ -11,7 +11,7 @@ export default function Sidebar({ data, activePg, onSelect, onAdd, user, demoMod
         </span>
         <div>
           <div className="brand-top">PGMaaya</div>
-          <div className="brand-name">pgmaya pg manager app</div>
+          <div className="brand-name">PG Manager</div>
           <div className="brand-sub">Multi-property &amp; vacancy</div>
         </div>
       </div>
