@@ -258,6 +258,13 @@ code {
   box-shadow: 0 6px 18px rgba(59, 130, 246, 0.35);
   flex-shrink: 0;
 }
+.brand-top {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--side-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 .brand-name {
   font-weight: 700;
   font-size: 1.1rem;

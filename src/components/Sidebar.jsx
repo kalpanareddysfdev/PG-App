@@ -10,9 +10,8 @@ export default function Sidebar({ data, activePg, onSelect, onAdd, user, demoMod
           <Building2 size={22} />
         </span>
         <div>
-          <div className="brand-name">
-            PGMaaya <span className="brand-tag">PWA</span>
-          </div>
+          <div className="brand-top">PGMaaya</div>
+          <div className="brand-name">pgmaya pg manager app</div>
           <div className="brand-sub">Multi-property &amp; vacancy</div>
         </div>
       </div>
