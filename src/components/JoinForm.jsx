@@ -47,6 +47,27 @@ export default function JoinForm({ token }) {
   }, [token])
 
   useEffect(() => {
+    // Demo mode: skip auth, show form directly with mock data
+    if (token === 'demo') {
+      setStatus('loading')
+      setLink({
+        pgName: 'Demo PG',
+        active: true,
+        beds: {
+          'room-1:A': true,
+          'room-1:B': true,
+          'room-2:A': true,
+        },
+        rooms: [
+          { id: 'room-1', name: '101', floor: '1', capacity: 2, rent: 15000 },
+          { id: 'room-2', name: '102', floor: '1', capacity: 1, rent: 12000 },
+        ],
+        claimed: {},
+      })
+      setUser({ email: 'demo@example.com', displayName: 'Demo User', uid: 'demo' })
+      setStatus('ready')
+      return
+    }
     if (!isFirebaseConfigured) {
       setStatus('error')
       setMessage('This app is not connected to a server yet.')
@@ -151,7 +172,6 @@ export default function JoinForm({ token }) {
     if (!form.emergencyContact.trim()) return setError('Please enter emergency contact details')
     if (!form.address.trim()) return setError('Please enter your permanent address')
     if (!form.idType) return setError('Please select your ID type')
-    if (!form.idNumber.trim()) return setError('Please enter your ID number')
     if (!room || !bed) return setError('Please choose your room and bed')
 
     setSubmitting(true)
@@ -357,13 +377,12 @@ export default function JoinForm({ token }) {
                 </select>
               </label>
               <label>
-                ID number
+                ID number <span className="optional">optional</span>
                 <input
                   value={form.idNumber}
                   onChange={(e) => update('idNumber', e.target.value)}
                   placeholder="e.g. 1234-5678-9012"
                   maxLength={60}
-                  required
                 />
               </label>
             </div>
