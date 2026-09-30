@@ -1,5 +1,4 @@
 import { useContext, useMemo, useState } from 'react'
-import { HelpCircle } from 'lucide-react'
 import Modal from './Modal'
 import { PhotoPicker, ProofPicker } from './FilePickers'
 import { ThumbsContext } from '../thumbs'
@@ -181,10 +180,7 @@ export default function MemberForm({
             />
           </label>
           <label>
-            <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-              Vacating on
-              <HelpCircle size={14} style={{cursor: 'help', flexShrink: 0}} title="Set only if member has given notice" />
-            </span>
+            Vacating on
             <input
               type="date"
               value={form.vacateDate}
