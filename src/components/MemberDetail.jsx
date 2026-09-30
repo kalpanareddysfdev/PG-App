@@ -113,6 +113,8 @@ export default function MemberDetail({
         {member.deposit ? <Row label="Deposit">{formatRupees(member.deposit)}</Row> : null}
         {member.emergencyContact && <Row label="Emergency">{member.emergencyContact}</Row>}
         {member.address && <Row label="Address">{member.address}</Row>}
+        {member.company && <Row label="Company/Institute">{member.company}</Row>}
+        {member.email && <Row label="Email">{member.email}</Row>}
         {member.notes && <Row label="Notes">{member.notes}</Row>}
       </div>
 

@@ -1,4 +1,5 @@
 import { useContext, useMemo, useState } from 'react'
+import { HelpCircle } from 'lucide-react'
 import Modal from './Modal'
 import { PhotoPicker, ProofPicker } from './FilePickers'
 import { ThumbsContext } from '../thumbs'
@@ -41,6 +42,10 @@ export default function MemberForm({
     paid: member ? isRentPaid(member) : false,
     emergencyContact: seed?.emergencyContact ?? '',
     address: seed?.address ?? '',
+    company: seed?.company ?? '',
+    email: seed?.email ?? '',
+    idType: seed?.idType ?? '',
+    idNumber: seed?.idNumber ?? '',
     notes: seed?.notes ?? '',
   }))
   const [error, setError] = useState('')
@@ -83,6 +88,10 @@ export default function MemberForm({
         name: form.name.trim(),
         phone: form.phone.trim(),
         address: form.address.trim(),
+        company: form.company.trim(),
+        email: form.email.trim(),
+        idType: form.idType,
+        idNumber: form.idNumber.trim(),
         bed: bedOptions.includes(form.bed) ? form.bed : bedOptions[0],
         rentPaidMonth,
       },
@@ -172,7 +181,10 @@ export default function MemberForm({
             />
           </label>
           <label>
-            Vacating on <span className="optional">if notice given</span>
+            <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+              Vacating on
+              <HelpCircle size={14} style={{cursor: 'help', flexShrink: 0}} title="Set only if member has given notice" />
+            </span>
             <input
               type="date"
               value={form.vacateDate}
@@ -200,7 +212,7 @@ export default function MemberForm({
             <span className="hint">Leave blank to use the room rate.</span>
           </label>
           <label>
-            Security deposit <span className="optional">optional</span>
+            Security deposit
             <div className="input-prefix">
               <span>₹</span>
               <input
@@ -231,7 +243,7 @@ export default function MemberForm({
 
         <p className="form-section">Address &amp; ID</p>
         <label>
-          Permanent address <span className="optional">optional</span>
+          Permanent address
           <textarea
             rows="2"
             value={form.address}
@@ -255,7 +267,7 @@ export default function MemberForm({
 
         <p className="form-section">Other</p>
         <label>
-          Emergency contact <span className="optional">optional</span>
+          Emergency contact
           <input
             value={form.emergencyContact}
             onChange={(e) => update('emergencyContact', e.target.value)}
@@ -263,12 +275,53 @@ export default function MemberForm({
           />
         </label>
         <label>
-          Notes <span className="optional">optional</span>
+          Company/Institute
+          <input
+            value={form.company}
+            onChange={(e) => update('company', e.target.value)}
+            placeholder="e.g. Infosys, Mysore University"
+            maxLength={120}
+          />
+        </label>
+        <label>
+          Email
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => update('email', e.target.value)}
+            placeholder="email@example.com"
+            maxLength={120}
+          />
+        </label>
+        <div className="form-row">
+          <label>
+            ID type
+            <select value={form.idType} onChange={(e) => update('idType', e.target.value)}>
+              <option value="">Select ID type</option>
+              {['Voter ID', 'Aadhar', 'Driving License'].map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            ID number
+            <input
+              value={form.idNumber}
+              onChange={(e) => update('idNumber', e.target.value)}
+              placeholder="e.g. 1234-5678-9012"
+              maxLength={60}
+            />
+          </label>
+        </div>
+        <label>
+          Notes
           <textarea
             rows="2"
             value={form.notes}
             onChange={(e) => update('notes', e.target.value)}
-            placeholder="ID proof, company / college, food preference…"
+            placeholder="Food preference, special notes…"
           />
         </label>
 

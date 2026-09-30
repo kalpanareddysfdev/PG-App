@@ -13,7 +13,7 @@ import { PhotoPicker, ProofPicker } from './FilePickers'
 import { bedKey, formatRupees, parseBedKey, pgDisplayName, sharingLabel } from '../utils'
 import { openDataUrl, splitChunks } from '../media'
 
-const blank = { name: '', phone: '', emergencyContact: '', address: '', idType: '', idNumber: '' }
+const blank = { name: '', phone: '', emergencyContact: '', address: '', idType: '', idNumber: '', company: '', email: '' }
 const ID_TYPES = ['Voter ID', 'Aadhar', 'Driving License']
 
 const IGNORED_AUTH_ERRORS = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request']
@@ -171,12 +171,17 @@ export default function JoinForm({ token }) {
     if (form.phone.replace(/\D/g, '').length < 10) return setError('Please enter a valid 10-digit phone number')
     if (!form.emergencyContact.trim()) return setError('Please enter emergency contact details')
     if (!form.address.trim()) return setError('Please enter your permanent address')
+    if (!photo) return setError('Please upload your profile photo')
     if (!form.idType) return setError('Please select your ID type')
+    if (!proof) return setError('Please upload your ID proof')
+    if (!form.company.trim()) return setError('Please enter your company or institute name')
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return setError('Please enter a valid email address')
     if (!room || !bed) return setError('Please choose your room and bed')
 
     setSubmitting(true)
     const key = bedKey(room.id, bed)
     try {
+      const idNote = form.idType ? `${form.idType}${form.idNumber ? ': ' + form.idNumber : ''}` : ''
       await submitJoinRequest(
         token,
         key,
@@ -186,8 +191,9 @@ export default function JoinForm({ token }) {
           phone: form.phone.trim().slice(0, 20),
           emergencyContact: form.emergencyContact.trim().slice(0, 120),
           address: form.address.trim().slice(0, 300),
-          idType: form.idType,
-          idNumber: form.idNumber.trim().slice(0, 60),
+          idNote: idNote.slice(0, 120),
+          company: form.company,
+          email: form.email.trim(),
           roomId: room.id,
           bed,
           hasPhoto: !!photo,
@@ -314,25 +320,29 @@ export default function JoinForm({ token }) {
             {accountBar}
 
             <p className="form-section">Your details</p>
-            <PhotoPicker
-              name={form.name}
-              preview={photo?.thumb}
-              onPick={setPhoto}
-              onRemove={() => setPhoto(null)}
-              onError={setError}
-            />
+            <div className="field">
+              <span className="field-label">Profile photo <span style={{color: 'var(--red)'}}>*</span></span>
+              <PhotoPicker
+                name={form.name}
+                preview={photo?.thumb}
+                onPick={setPhoto}
+                onRemove={() => setPhoto(null)}
+                onError={setError}
+              />
+            </div>
             <label>
-              Full name
+              Full name <span style={{color: 'var(--red)'}}>*</span>
               <input
                 value={form.name}
                 onChange={(e) => update('name', e.target.value)}
                 placeholder="As on your ID"
                 autoComplete="name"
                 maxLength={80}
+                required
               />
             </label>
             <label>
-              Phone number
+              Phone number <span style={{color: 'var(--red)'}}>*</span>
               <input
                 type="tel"
                 inputMode="tel"
@@ -341,10 +351,11 @@ export default function JoinForm({ token }) {
                 placeholder="98765 43210"
                 autoComplete="tel"
                 maxLength={20}
+                required
               />
             </label>
             <label>
-              Emergency contact <span className="optional">name &amp; phone</span>
+              Emergency contact <span style={{color: 'var(--red)'}}>*</span>
               <input
                 value={form.emergencyContact}
                 onChange={(e) => update('emergencyContact', e.target.value)}
@@ -354,7 +365,7 @@ export default function JoinForm({ token }) {
               />
             </label>
             <label>
-              Permanent address
+              Permanent address <span style={{color: 'var(--red)'}}>*</span>
               <textarea
                 rows="2"
                 value={form.address}
@@ -366,7 +377,7 @@ export default function JoinForm({ token }) {
             </label>
             <div className="form-row">
               <label>
-                ID type
+                ID type <span style={{color: 'var(--red)'}}>*</span>
                 <select value={form.idType} onChange={(e) => update('idType', e.target.value)} required>
                   <option value="">Select ID type</option>
                   {ID_TYPES.map((t) => (
@@ -377,7 +388,10 @@ export default function JoinForm({ token }) {
                 </select>
               </label>
               <label>
-                ID number <span className="optional">optional</span>
+                <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem'}}>
+                  ID number
+                  <HelpCircle size={14} style={{cursor: 'help', flexShrink: 0}} title="Optional - only if you have it" />
+                </span>
                 <input
                   value={form.idNumber}
                   onChange={(e) => update('idNumber', e.target.value)}
@@ -386,13 +400,42 @@ export default function JoinForm({ token }) {
                 />
               </label>
             </div>
-            <ProofPicker
-              fileName={proof?.name}
-              onPick={setProof}
-              onRemove={() => setProof(null)}
-              onView={proof ? () => openDataUrl(proof.data, proof.name) : undefined}
-              onError={setError}
-            />
+            <div className="field">
+              <span className="field-label">ID proof <span style={{color: 'var(--red)'}}>*</span></span>
+              <ProofPicker
+                fileName={proof?.name}
+                onPick={setProof}
+                onRemove={() => setProof(null)}
+                onView={proof ? () => openDataUrl(proof.data, proof.name) : undefined}
+                onError={setError}
+              />
+            </div>
+
+            <p className="form-section">Additional info</p>
+            <label>
+              Company/Institute <span style={{color: 'var(--red)'}}>*</span>
+              <input
+                value={form.company}
+                onChange={(e) => update('company', e.target.value)}
+                placeholder="e.g. Infosys, Mysore University"
+                maxLength={120}
+                required
+              />
+            </label>
+            <label>
+              <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem'}}>
+                Email
+                <HelpCircle size={14} style={{cursor: 'help', flexShrink: 0}} title="Optional - we'll use this for updates" />
+              </span>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => update('email', e.target.value)}
+                placeholder="your.email@example.com"
+                maxLength={120}
+                autoComplete="email"
+              />
+            </label>
 
             <p className="form-section">Choose your bed</p>
             {rooms.length === 0 ? (
