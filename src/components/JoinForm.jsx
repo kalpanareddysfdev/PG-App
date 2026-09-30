@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
-import { BedDouble, Building2, CheckCircle2, Loader2, Lock, LogOut } from 'lucide-react'
+import { BedDouble, Building2, CheckCircle2, HelpCircle, Loader2, Lock, LogOut } from 'lucide-react'
 import { auth, googleProvider, isFirebaseConfigured } from '../firebase'
 import {
   AlreadyAppliedError,
