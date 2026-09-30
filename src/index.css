@@ -216,6 +216,51 @@ code {
   padding: 0.75rem 0.9rem;
   line-height: 1.5;
 }
+.form-button {
+  display: block;
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.form-button:hover:not(:disabled) {
+  background: var(--primary-600);
+}
+.form-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.link-button {
+  display: inline;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+.link-button:hover {
+  color: var(--primary-600);
+}
+.auth-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+.login-card .form-row {
+  grid-template-columns: 1fr;
+}
 
 /* ============ Layout ============ */
 .app {

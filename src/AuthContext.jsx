@@ -1,23 +1,23 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import {
   onAuthStateChanged,
-  signInWithPopup,
   signOut as fbSignOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from 'firebase/auth'
-import { auth, googleProvider, isFirebaseConfigured } from './firebase'
+import { auth, isFirebaseConfigured } from './firebase'
 
 const AuthContext = createContext(null)
 
 const DEMO_KEY = 'pg-app:demo-user'
 
 const AUTH_ERRORS = {
-  'auth/configuration-not-found':
-    'Google sign-in is not enabled yet. In Firebase Console open Authentication → Sign-in method and enable Google.',
-  'auth/operation-not-allowed':
-    'Google sign-in is disabled. Enable it in Firebase Console → Authentication → Sign-in method.',
-  'auth/unauthorized-domain':
-    'This website is not allowed to sign in. Add it under Firebase Console → Authentication → Settings → Authorized domains.',
-  'auth/popup-blocked': 'The browser blocked the sign-in popup. Allow popups for this site and try again.',
+  'auth/email-already-in-use': 'This email is already registered. Sign in instead.',
+  'auth/weak-password': 'Password must be at least 6 characters.',
+  'auth/user-not-found': 'No account found with this email.',
+  'auth/wrong-password': 'Incorrect password.',
+  'auth/invalid-email': 'Please enter a valid email address.',
   'auth/network-request-failed': 'No internet connection. Check your network and try again.',
 }
 
@@ -56,13 +56,14 @@ export function AuthProvider({ children }) {
     })
   }, [])
 
-  async function signIn() {
+
+  async function signUpWithEmail(email, password) {
     setError('')
     if (!isFirebaseConfigured) {
       const demoUser = {
         uid: 'demo-user',
-        name: 'Demo Manager',
-        email: 'demo@pgapp.local',
+        name: email,
+        email,
         photo: null,
         demo: true,
       }
@@ -71,9 +72,46 @@ export function AuthProvider({ children }) {
       return
     }
     try {
-      await signInWithPopup(auth, googleProvider)
+      await createUserWithEmailAndPassword(auth, email, password)
     } catch (err) {
-      if (!IGNORED_ERRORS.includes(err?.code)) setError(friendlyAuthError(err))
+      setError(friendlyAuthError(err))
+      throw err
+    }
+  }
+
+  async function signInWithEmail(email, password) {
+    setError('')
+    if (!isFirebaseConfigured) {
+      const demoUser = {
+        uid: 'demo-user',
+        name: email,
+        email,
+        photo: null,
+        demo: true,
+      }
+      localStorage.setItem(DEMO_KEY, JSON.stringify(demoUser))
+      setUser(demoUser)
+      return
+    }
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+    } catch (err) {
+      setError(friendlyAuthError(err))
+      throw err
+    }
+  }
+
+  async function resetPassword(email) {
+    setError('')
+    if (!isFirebaseConfigured) {
+      setError('Password reset is not available in demo mode.')
+      return
+    }
+    try {
+      await sendPasswordResetEmail(auth, email)
+    } catch (err) {
+      setError(friendlyAuthError(err))
+      throw err
     }
   }
 
@@ -88,7 +126,16 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, error, signIn, signOut, demoMode: !isFirebaseConfigured }}
+      value={{
+        user,
+        loading,
+        error,
+        signUpWithEmail,
+        signInWithEmail,
+        resetPassword,
+        signOut,
+        demoMode: !isFirebaseConfigured,
+      }}
     >
       {children}
     </AuthContext.Provider>
