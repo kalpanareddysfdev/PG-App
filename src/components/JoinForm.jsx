@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
-import { BedDouble, Building2, CheckCircle2, HelpCircle, Loader2, Lock, LogOut } from 'lucide-react'
+import { BedDouble, Building2, CheckCircle2, Home, Loader2, Lock, LogOut, MapPin, Phone, User } from 'lucide-react'
 import { auth, googleProvider, isFirebaseConfigured } from '../firebase'
 import {
   AlreadyAppliedError,
@@ -36,6 +36,7 @@ export default function JoinForm({ token }) {
   const [bed, setBed] = useState('')
   const [photo, setPhoto] = useState(null)
   const [proof, setProof] = useState(null)
+  const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -52,6 +53,8 @@ export default function JoinForm({ token }) {
       setStatus('loading')
       setLink({
         pgName: 'Demo PG',
+        terms:
+          '1. Rent is due by the 5th of every month.\n2. One month notice is required before vacating.\n3. No smoking or alcohol inside the premises.\n4. Visitors are allowed only until 9 PM.',
         active: true,
         beds: {
           'room-1:A': true,
@@ -178,6 +181,8 @@ export default function JoinForm({ token }) {
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return setError('Please enter a valid email address')
     if (!room || !bed) return setError('Please choose your room and bed')
 
+    if (link.terms && !agreed) return setError('Please agree to the Terms & Conditions')
+
     setSubmitting(true)
     const key = bedKey(room.id, bed)
     try {
@@ -239,14 +244,13 @@ export default function JoinForm({ token }) {
 
   return (
     <div className="join">
+      <JoinBackdrop />
       <header className="join-head">
-        <span className="brand-icon">
-          <Building2 size={20} />
-        </span>
-        <div>
-          <strong>{status === 'ready' ? pgName : 'PGMaaya'}</strong>
-          <span>Tenant registration</span>
+        <div className="join-logo">
+          <span className="join-logo-pg">PG</span>
+          <span className="join-logo-name">Maaya</span>
         </div>
+        <p className="join-tagline">Your Home Away From Home</p>
       </header>
 
       <main className="join-body">
@@ -313,9 +317,20 @@ export default function JoinForm({ token }) {
 
         {status === 'ready' && !application && link.active && (
           <form className="join-card form" onSubmit={submit}>
-            <div>
-              <h1>Join {pgName}</h1>
-              <p className="muted">Fill in your details and choose your bed. Takes about 2 minutes.</p>
+            <div className="join-welcome">
+              <span className="join-eyebrow">Welcome to</span>
+              <h1>{pgName}</h1>
+              <p className="muted">Fill in your details and become a part of your PG community.</p>
+              <span className="join-accent" />
+            </div>
+            <div className="join-banner">
+              <span className="join-banner-icon">
+                <Home size={24} />
+              </span>
+              <div>
+                <span className="join-eyebrow small">You are joining</span>
+                <strong>{pgName}</strong>
+              </div>
             </div>
             {accountBar}
 
@@ -332,48 +347,60 @@ export default function JoinForm({ token }) {
             </div>
             <label>
               Full name <span style={{color: 'var(--red)'}}>*</span>
-              <input
-                value={form.name}
-                onChange={(e) => update('name', e.target.value)}
-                placeholder="As on your ID"
-                autoComplete="name"
-                maxLength={80}
-                required
-              />
+              <span className="input-icon">
+                <User size={18} />
+                <input
+                  value={form.name}
+                  onChange={(e) => update('name', e.target.value)}
+                  placeholder="Enter your full name"
+                  autoComplete="name"
+                  maxLength={80}
+                  required
+                />
+              </span>
             </label>
             <label>
               Phone number <span style={{color: 'var(--red)'}}>*</span>
-              <input
-                type="tel"
-                inputMode="tel"
-                value={form.phone}
-                onChange={(e) => update('phone', e.target.value)}
-                placeholder="98765 43210"
-                autoComplete="tel"
-                maxLength={20}
-                required
-              />
+              <span className="input-icon">
+                <Phone size={18} />
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  value={form.phone}
+                  onChange={(e) => update('phone', e.target.value)}
+                  placeholder="98765 43210"
+                  autoComplete="tel"
+                  maxLength={20}
+                  required
+                />
+              </span>
             </label>
             <label>
               Emergency contact <span style={{color: 'var(--red)'}}>*</span>
-              <input
-                value={form.emergencyContact}
-                onChange={(e) => update('emergencyContact', e.target.value)}
-                placeholder="e.g. Father – 98xxxxxx10"
-                maxLength={120}
-                required
-              />
+              <span className="input-icon">
+                <Phone size={18} />
+                <input
+                  value={form.emergencyContact}
+                  onChange={(e) => update('emergencyContact', e.target.value)}
+                  placeholder="Enter emergency contact number"
+                  maxLength={120}
+                  required
+                />
+              </span>
             </label>
             <label>
               Permanent address <span style={{color: 'var(--red)'}}>*</span>
-              <textarea
-                rows="2"
-                value={form.address}
-                onChange={(e) => update('address', e.target.value)}
-                placeholder="House, street, city, PIN"
-                maxLength={300}
-                required
-              />
+              <span className="input-icon">
+                <MapPin size={18} />
+                <textarea
+                  rows="2"
+                  value={form.address}
+                  onChange={(e) => update('address', e.target.value)}
+                  placeholder="House, street, city, PIN"
+                  maxLength={300}
+                  required
+                />
+              </span>
             </label>
             <div className="form-row">
               <label>
@@ -388,10 +415,7 @@ export default function JoinForm({ token }) {
                 </select>
               </label>
               <label>
-                <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem'}}>
-                  ID number
-                  <HelpCircle size={14} style={{cursor: 'help', flexShrink: 0}} title="Optional - only if you have it" />
-                </span>
+                <span title="Optional - only if you have it">ID number</span>
                 <input
                   value={form.idNumber}
                   onChange={(e) => update('idNumber', e.target.value)}
@@ -401,8 +425,8 @@ export default function JoinForm({ token }) {
               </label>
             </div>
             <div className="field">
-              <span className="field-label">ID proof <span style={{color: 'var(--red)'}}>*</span></span>
               <ProofPicker
+                required
                 fileName={proof?.name}
                 onPick={setProof}
                 onRemove={() => setProof(null)}
@@ -414,19 +438,19 @@ export default function JoinForm({ token }) {
             <p className="form-section">Additional info</p>
             <label>
               Company/Institute <span style={{color: 'var(--red)'}}>*</span>
-              <input
-                value={form.company}
-                onChange={(e) => update('company', e.target.value)}
-                placeholder="e.g. Infosys, Mysore University"
-                maxLength={120}
-                required
-              />
+              <span className="input-icon">
+                <Building2 size={18} />
+                <input
+                  value={form.company}
+                  onChange={(e) => update('company', e.target.value)}
+                  placeholder="e.g. Infosys, Mysore University"
+                  maxLength={120}
+                  required
+                />
+              </span>
             </label>
             <label>
-              <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem'}}>
-                Email
-                <HelpCircle size={14} style={{cursor: 'help', flexShrink: 0}} title="Optional - we'll use this for updates" />
-              </span>
+              <span title="Optional - we'll use this for updates">Email</span>
               <input
                 type="email"
                 value={form.email}
@@ -504,6 +528,17 @@ export default function JoinForm({ token }) {
               </>
             )}
 
+            {link.terms && (
+              <div className="field terms-box">
+                <span className="field-label">Terms &amp; Conditions</span>
+                <div className="terms-text" tabIndex={0}>{link.terms}</div>
+                <label className="terms-agree">
+                  <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} required />
+                  <span>I have read and agree to the Terms &amp; Conditions</span>
+                </label>
+              </div>
+            )}
+
             {error && <p className="error">{error}</p>}
 
             <button type="submit" className="btn primary block" disabled={submitting || rooms.length === 0}>
@@ -513,6 +548,10 @@ export default function JoinForm({ token }) {
             <p className="muted small center-text">
               Your details are shared only with the {pgName} manager.
             </p>
+            <div className="join-foot">
+              <strong>PGMaaya</strong>
+              <span>Safe Stays · Better Tomorrows</span>
+            </div>
           </form>
         )}
       </main>
@@ -528,5 +567,39 @@ function GoogleMark() {
       <path fill="#FBBC05" d="M10.4 28.7a14.5 14.5 0 010-9.3l-7.8-6.1a24 24 0 000 21.5l7.8-6.1z" />
       <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.7-3.7-13.6-9.1l-7.8 6.1C6.5 42.6 14.6 48 24 48z" />
     </svg>
+  )
+}
+
+function JoinBackdrop() {
+  return (
+    <>
+      <svg className="join-art top" viewBox="0 0 430 220" aria-hidden="true">
+        <g transform="translate(0 -52)">
+        <circle cx="268" cy="104" r="22" fill="#f9dca0" opacity=".85" />
+        <g fill="none" stroke="#a79bd6" strokeWidth="5" strokeLinejoin="round" strokeLinecap="round">
+          <path d="M296 150 350 100 404 150M308 140V168" />
+        </g>
+        <g fill="#a79bd6" opacity=".8">
+          <rect x="336" y="116" width="9" height="9" rx="1.5" />
+          <rect x="349" y="116" width="9" height="9" rx="1.5" />
+          <rect x="336" y="129" width="9" height="9" rx="1.5" />
+          <rect x="349" y="129" width="9" height="9" rx="1.5" />
+        </g>
+        <g fill="#7b9a62">
+          <path d="M400 150C388 130 392 100 412 82 420 104 414 132 400 150Z" />
+          <path d="M398 168C382 156 376 132 382 112 398 122 406 146 398 168Z" />
+          <path d="M402 180C420 170 428 150 426 130 408 138 398 158 402 180Z" />
+        </g>
+        <path d="M300 172C340 184 392 184 430 158" fill="none" stroke="#f0b64a" strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+      </svg>
+      <svg className="join-art bottom" viewBox="0 0 430 160" aria-hidden="true">
+        <g fill="#9a90d0" opacity=".7">
+          <path d="M410 150C398 130 402 100 420 82 428 104 424 132 410 150Z" />
+          <path d="M424 160C410 150 404 132 408 116 424 122 432 142 424 160Z" />
+          <path d="M392 160C380 150 376 134 380 120 394 128 400 144 392 160Z" />
+        </g>
+      </svg>
+    </>
   )
 }

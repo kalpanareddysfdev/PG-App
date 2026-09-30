@@ -55,7 +55,7 @@ export function PhotoPicker({ name, preview, onPick, onRemove, onError }) {
   )
 }
 
-export function ProofPicker({ fileName, onPick, onRemove, onView, onError }) {
+export function ProofPicker({ fileName, onPick, onRemove, onView, onError, required }) {
   const input = useRef(null)
   const [busy, setBusy] = useState(false)
 
@@ -76,7 +76,8 @@ export function ProofPicker({ fileName, onPick, onRemove, onView, onError }) {
   return (
     <div className="field">
       <span className="field-label">
-        ID proof <span className="optional">PDF or image · max 1 MB</span>
+        <span title="PDF or image · max 1 MB">ID proof</span>
+        {required && <span style={{ color: 'var(--red)' }}> *</span>}
       </span>
       {fileName ? (
         <div className="file-chip">

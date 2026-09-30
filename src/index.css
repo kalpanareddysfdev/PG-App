@@ -2811,3 +2811,261 @@ textarea {
   gap: 0.3rem;
   padding: 0;
 }
+
+/* ============ Join page: PGMaaya theme ============ */
+.join {
+  --jp: #5b46a8;
+  --jp-dark: #2a1a6e;
+  --jp-50: #f1eefc;
+  --jp-border: #dcd6f3;
+  background: linear-gradient(160deg, #fdf6f0 0%, #f3effb 55%, #e9e4f8 100%);
+}
+.join .join-head {
+  display: grid;
+  justify-items: start;
+  gap: 0.35rem;
+  background: transparent;
+  color: var(--jp-dark);
+  padding: 1.6rem 1.5rem 0.4rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.join-logo {
+  display: flex;
+  align-items: baseline;
+  color: var(--jp-dark);
+  line-height: 1;
+}
+.join-logo-pg {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+.join-logo-name {
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.join .join-head .join-tagline {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: none;
+  color: var(--jp-dark);
+  opacity: 0.85;
+}
+.join .join-card {
+  border-radius: 28px;
+  border-color: var(--jp-border);
+  box-shadow: 0 12px 40px rgba(70, 50, 140, 0.12);
+  padding: 1.6rem 1.4rem;
+}
+.join-eyebrow {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--jp);
+}
+.join-eyebrow.small {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+.join .join-card h1 {
+  font-size: 2rem;
+  color: var(--jp-dark);
+  margin: 0.15rem 0 0.4rem;
+}
+.join-accent {
+  display: block;
+  width: 42px;
+  height: 3px;
+  margin-top: 0.8rem;
+  border-radius: 2px;
+  background: #f0b64a;
+}
+.join-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--jp-border);
+  border-radius: 18px;
+  background: linear-gradient(90deg, var(--jp-50), #f7f5fe);
+}
+.join-banner strong {
+  display: block;
+  font-size: 1.15rem;
+  color: var(--jp-dark);
+}
+.join-banner-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #e3ddf8;
+  color: var(--jp-dark);
+}
+.join .join-account {
+  background: var(--jp-50);
+  border-color: var(--jp-border);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+}
+.join .join-account .link-btn {
+  color: var(--jp);
+  font-weight: 600;
+}
+.join .form-section {
+  color: var(--jp-dark);
+  font-size: 1.2rem;
+}
+.join .form input,
+.join .form select,
+.join .form textarea {
+  border-color: var(--jp-border);
+  border-radius: 14px;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.join .form input:focus,
+.join .form select:focus,
+.join .form textarea:focus {
+  outline: none;
+  border-color: var(--jp);
+  box-shadow: 0 0 0 3px rgba(91, 70, 168, 0.15);
+}
+.join .btn.primary {
+  background: linear-gradient(90deg, #6a54b8, #4f3d9c);
+  border-color: transparent;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+}
+.join .chip-toggle.on,
+.join .join-room.on {
+  border-color: var(--jp);
+  background: var(--jp-50);
+  color: var(--jp-dark);
+}
+.join .join-room.on {
+  box-shadow: 0 0 0 2px rgba(91, 70, 168, 0.18);
+}
+.join .join-room:hover {
+  border-color: var(--jp);
+}
+.join-foot {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  color: var(--jp-dark);
+}
+.join-foot span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.join .join-head .join-logo {
+  display: flex;
+}
+.join .join-head .join-logo-pg {
+  font-size: 3.2rem;
+  color: var(--jp-dark);
+}
+.join .join-head .join-logo-name {
+  font-size: 2.3rem;
+  color: var(--jp-dark);
+}
+
+/* ============ Join page: backdrop, icons, photo picker ============ */
+.join {
+  position: relative;
+  overflow: hidden;
+}
+.join-art {
+  position: absolute;
+  left: 50%;
+  width: 100%;
+  max-width: 560px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+.join-art.top {
+  top: 0;
+}
+.join-art.bottom {
+  bottom: 0;
+}
+.join {
+  background:
+    radial-gradient(420px 320px at 100% 8%, rgba(214, 203, 245, 0.75), transparent 70%),
+    radial-gradient(360px 300px at 0% 4%, rgba(253, 226, 205, 0.8), transparent 70%),
+    radial-gradient(420px 320px at 0% 100%, rgba(214, 203, 245, 0.7), transparent 70%),
+    linear-gradient(160deg, #fdf6f0 0%, #f3effb 55%, #ece7f9 100%);
+}
+.join .join-head,
+.join .join-body {
+  position: relative;
+  z-index: 1;
+}
+.join .input-icon {
+  position: relative;
+  display: block;
+  margin-top: 0.3rem;
+}
+.join .input-icon > svg {
+  position: absolute;
+  left: 0.9rem;
+  top: 0.95rem;
+  color: var(--jp);
+  pointer-events: none;
+}
+.join .input-icon > input,
+.join .input-icon > textarea {
+  width: 100%;
+  padding-left: 2.6rem;
+  margin-top: 0;
+}
+.join .photo-circle {
+  border: 2px dashed #c9c2e6;
+  background: #faf9ff;
+  color: var(--jp);
+}
+.join .photo-circle > span {
+  background: transparent !important;
+  color: var(--jp) !important;
+}
+.join .photo-badge {
+  display: none;
+}
+.join .photo-actions .link-btn {
+  color: var(--jp);
+  font-weight: 600;
+}
+
+.terms-text {
+  max-height: 3em;
+  line-height: 1.5;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  padding: 6px 10px;
+  border: 1px solid var(--border, #d0d5dd);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.join .form .terms-agree {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+.terms-agree input {
+  width: auto;
+  flex: none;
+}

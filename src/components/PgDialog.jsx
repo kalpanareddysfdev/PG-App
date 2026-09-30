@@ -4,12 +4,13 @@ import Modal from './Modal'
 export default function PgDialog({ property, suggestedName, onSave, onClose }) {
   const [name, setName] = useState(property?.name ?? suggestedName ?? '')
   const [address, setAddress] = useState(property?.address ?? '')
+  const [terms, setTerms] = useState(property?.terms ?? '')
   const [error, setError] = useState('')
 
   function submit(e) {
     e.preventDefault()
     if (!name.trim()) return setError('Give this PG a name or number')
-    onSave({ name: name.trim(), address: address.trim() })
+    onSave({ name: name.trim(), address: address.trim(), terms: terms.trim() })
   }
 
   return (
@@ -37,6 +38,17 @@ export default function PgDialog({ property, suggestedName, onSave, onClose }) {
             onChange={(e) => setAddress(e.target.value)}
             placeholder="e.g. HSR Layout, Bengaluru"
           />
+        </label>
+        <label>
+          Terms &amp; Conditions <span className="optional">optional</span>
+          <textarea
+            value={terms}
+            onChange={(e) => setTerms(e.target.value)}
+            rows={5}
+            maxLength={3000}
+            placeholder="Rules tenants must agree to before joining, e.g. notice period, visitors, deposit refund"
+          />
+          <span className="hint">Shown at the bottom of your tenant registration form.</span>
         </label>
         {error && <p className="error">{error}</p>}
         <div className="form-actions">

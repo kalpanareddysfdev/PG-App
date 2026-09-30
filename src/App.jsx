@@ -64,6 +64,7 @@ function linkSnapshot(property, rooms, members) {
   const own = rooms.filter((r) => r.propertyId === property.id)
   return {
     pgName: property.name || '',
+    terms: property.terms || '',
     rooms: own.map((r) => ({
       id: r.id,
       name: r.name,
@@ -573,7 +574,10 @@ export default function App() {
                 role="tab"
                 aria-selected={tab === key}
                 className={tab === key ? 'active' : ''}
-                onClick={() => setTab(key)}
+                onClick={() => {
+                  setMenuOpen(false)
+                  setTab(key)
+                }}
               >
                 <Icon size={16} /> {label}
               </button>
