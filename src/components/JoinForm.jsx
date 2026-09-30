@@ -13,7 +13,8 @@ import { PhotoPicker, ProofPicker } from './FilePickers'
 import { bedKey, formatRupees, parseBedKey, pgDisplayName, sharingLabel } from '../utils'
 import { openDataUrl, splitChunks } from '../media'
 
-const blank = { name: '', phone: '', emergencyContact: '', address: '', idNote: '' }
+const blank = { name: '', phone: '', emergencyContact: '', address: '', idType: '', idNumber: '' }
+const ID_TYPES = ['Voter ID', 'Aadhar', 'Driving License']
 
 const IGNORED_AUTH_ERRORS = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request']
 
@@ -147,6 +148,10 @@ export default function JoinForm({ token }) {
     setError('')
     if (!form.name.trim()) return setError('Please enter your full name')
     if (form.phone.replace(/\D/g, '').length < 10) return setError('Please enter a valid 10-digit phone number')
+    if (!form.emergencyContact.trim()) return setError('Please enter emergency contact details')
+    if (!form.address.trim()) return setError('Please enter your permanent address')
+    if (!form.idType) return setError('Please select your ID type')
+    if (!form.idNumber.trim()) return setError('Please enter your ID number')
     if (!room || !bed) return setError('Please choose your room and bed')
 
     setSubmitting(true)
@@ -161,7 +166,8 @@ export default function JoinForm({ token }) {
           phone: form.phone.trim().slice(0, 20),
           emergencyContact: form.emergencyContact.trim().slice(0, 120),
           address: form.address.trim().slice(0, 300),
-          idNote: form.idNote.trim().slice(0, 120),
+          idType: form.idType,
+          idNumber: form.idNumber.trim().slice(0, 60),
           roomId: room.id,
           bed,
           hasPhoto: !!photo,
@@ -212,7 +218,7 @@ export default function JoinForm({ token }) {
           <Building2 size={20} />
         </span>
         <div>
-          <strong>{status === 'ready' ? pgName : 'PG Manager'}</strong>
+          <strong>{status === 'ready' ? pgName : 'PGMaaya'}</strong>
           <span>Tenant registration</span>
         </div>
       </header>
@@ -324,6 +330,7 @@ export default function JoinForm({ token }) {
                 onChange={(e) => update('emergencyContact', e.target.value)}
                 placeholder="e.g. Father – 98xxxxxx10"
                 maxLength={120}
+                required
               />
             </label>
             <label>
@@ -334,17 +341,32 @@ export default function JoinForm({ token }) {
                 onChange={(e) => update('address', e.target.value)}
                 placeholder="House, street, city, PIN"
                 maxLength={300}
+                required
               />
             </label>
-            <label>
-              ID type &amp; number <span className="optional">optional</span>
-              <input
-                value={form.idNote}
-                onChange={(e) => update('idNote', e.target.value)}
-                placeholder="e.g. Aadhaar XXXX-XXXX-1234"
-                maxLength={120}
-              />
-            </label>
+            <div className="form-row">
+              <label>
+                ID type
+                <select value={form.idType} onChange={(e) => update('idType', e.target.value)} required>
+                  <option value="">Select ID type</option>
+                  {ID_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                ID number
+                <input
+                  value={form.idNumber}
+                  onChange={(e) => update('idNumber', e.target.value)}
+                  placeholder="e.g. 1234-5678-9012"
+                  maxLength={60}
+                  required
+                />
+              </label>
+            </div>
             <ProofPicker
               fileName={proof?.name}
               onPick={setProof}

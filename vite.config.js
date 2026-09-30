@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'PG Manager',
-        short_name: 'PG Manager',
+        name: 'PGMaaya',
+        short_name: 'PGMaaya',
         description: 'Manage PG rooms, beds, vacancies and tenants.',
         theme_color: '#0f1420',
         background_color: '#0f1420',
