@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Check, Copy, Link2, Loader2, MessageCircle, RefreshCw, ShieldCheck } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import QRCode from 'qrcode'
+import { Check, Copy, Download, Eye, EyeOff, Link2, Loader2, MessageCircle, RefreshCw, ShieldCheck } from 'lucide-react'
 import Modal from './Modal'
 import { pgDisplayName, whatsappShare } from '../utils'
 
@@ -11,10 +12,21 @@ export default function InviteDialog({ property, freeBeds, demoMode, onEnable, o
   const [busy, setBusy] = useState('')
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState('')
+  const [qr, setQr] = useState('')
+  const [showQr, setShowQr] = useState(false)
   const invite = property.invite
   const url = invite?.token ? joinUrl(invite.token) : ''
   const pg = pgDisplayName(property.name)
   const message = `Hi! Please register for ${pg}. Fill in your details and choose your room and bed here:\n${url}`
+
+  useEffect(() => {
+    if (!url) return
+    let cancelled = false
+    QRCode.toDataURL(url, { width: 512, margin: 2 }).then((d) => !cancelled && setQr(d))
+    return () => {
+      cancelled = true
+    }
+  }, [url])
 
   async function run(kind, fn) {
     setBusy(kind)
@@ -98,6 +110,23 @@ export default function InviteDialog({ property, freeBeds, demoMode, onEnable, o
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>
+
+          {qr && invite.active && (
+            <div className="invite-qr">
+              {showQr && (
+                <img src={qr} alt={`QR code for ${pg} invite link`} width={160} height={160} />
+              )}
+              <div className="invite-qr-actions">
+                <button type="button" className="btn small" onClick={() => setShowQr((v) => !v)}>
+                  {showQr ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {showQr ? 'Hide QR' : 'Show QR'}
+                </button>
+                <a className="btn small" href={qr} download={`${pg.replace(/\s+/g, '-')}-invite-qr.png`}>
+                  <Download size={15} /> Download QR
+                </a>
+              </div>
+            </div>
+          )}
 
           <a
             className={`btn whatsapp ${invite.active ? '' : 'disabled-link'}`}
